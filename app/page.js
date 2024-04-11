@@ -1,95 +1,140 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+// function getJoke() {
+// fetch("https://api.chucknorris.io/jokes/random",{method: "GET"})
+//     .then((response)=>{
+//         response.json()
+//             .then((data)=>{
+//                 console.log(data);
+//             })
+//     })
+// }
 
-export default function Home() {
-  return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+// async function getJoke(){
+//     const response = await fetch("https://api.chucknorris.io/jokes/random",{method: "GET"});
+//     const data = await response.json();
+//     return data.value;
+// }
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
+// export default async function Home() {
+//      const joke = await getJoke();
+//      console.log(joke);
+     
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+// return (
+//         <main>
+//             <h1> Joke Of The Day!</h1>
+//             <p>{joke}</p>
+//         </main>
+//     );
+// }
+
+//CLIENT SIDE DATA FETCHING
+// 'use client'
+// import { useState, useEffect } from "react";
+
+
+// export default function Home() {  
+// const [loading, setLoading] = useState(true);
+// const [joke, setJoke] = useState('');
+
+// useEffect(()=>{
+//     getJoke();
+//     async function getJoke(){
+//         const response = await fetch("https://api.chucknorris.io/jokes/random",{method: "GET"});
+//         const data = await response.json();
+
+//         setJoke(data.value);
+//         setLoading(false);
+//     }
+// }, []);
+
+// return (
+//         <main>
+//             <h1> Joke Of The Day!</h1>
+//             {loading && <img src="/loadingGIF.gif"/>}
+//             <p>{joke}</p>
+//         </main>
+//     );
+// }
+
+
+//HYBRID 
+
+// 'use client'
+// import { useState} from "react";
+
+
+// export default function Home() {  
+// const [joke, setJoke] = useState("Click the below button to get a joke.");
+// const [buttonText, setButtonText] = useState("Get Joke");
+
+// function handleGetJoke(){
+//     setButtonText("Fetching Joke...")
+//     getJoke();
+//         async function getJoke(){
+//             const response = await fetch("https://api.chucknorris.io/jokes/random",{method: "GET"});
+//             const data = await response.json();
+    
+//             setJoke(data.value);
+//             setButtonText("Get Joke")
+//         }
+// }
+
+// return (
+//         <main>
+//             <h1> Joke Of The Day!</h1>
+//             <p>{joke}</p>
+//             <button onClick={handleGetJoke} disabled={false}>{buttonText}</button>
+//         </main>
+//     );
+// }
+
+
+'use client'
+import { useState, useEffect} from "react";
+
+
+export default function Home() {  
+const [joke, setJoke] = useState("");
+const [loading, setLoading] = useState(true);
+
+
+
+useEffect(()=>{
+    let ignore = false;
+    if (loading){
+        getJoke();
+    }
+    async function getJoke(){
+        const response = await fetch("https://api.chucknorris.io/jokes/random",{method: "GET"});
+        const data = await response.json();
+
+       if (!ignore){
+            setJoke(data.value);
+            setLoading(false);
+       }
+    }
+    return ()=>{
+        ignore = true;
+    }
+}, [loading]);
+
+function handleGetJoke(){
+    setLoading(true);
 }
+
+return (
+        <main>
+            <h1> Joke Of The Day!</h1>
+            {loading && <img src="/loadingGIF.gif"/>}
+            {!loading && <>
+                <p>{joke}</p>
+                <button onClick={handleGetJoke} disabled={loading}>Get New Joke</button>
+            </>}
+        </main>
+    );
+}
+
+
